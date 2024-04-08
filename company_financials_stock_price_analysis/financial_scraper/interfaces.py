@@ -1,6 +1,109 @@
-company_statistics = {
+from abc import ABC, abstractmethod
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import requests
+
+
+class SessionHandler(ABC):
+
+    @abstractmethod
+    def new_session():
+        NotImplementedError
+
+class RequestHandler(ABC):
+
+    @abstractmethod
+    def request_data():
+        NotImplementedError
+
+class SaveHandler(ABC):
+
+    @abstractmethod
+    def save():
+        NotImplementedError
+
+class S3SaveHandler(SaveHandler):
+
+    def save():
+        pass
+
+class PostgresSaveHandler(SaveHandler):
+
+    def save():
+        pass
+
+class LocalSaveHandler(SaveHandler):
+
+    def save():
+        pass
+
+class YahooFinanceSessionHandler(SessionHandler):
+
+    def __init__(self):
+        self.session = None
     
-}
+    def new_session(self):
+        self.session = requests.Session()
+        requests.utils.add_dict_to_cookiejar(self.session.cookies, self.__get_site_cookies())
+        return
+        
+    @staticmethod
+    def __get_site_cookies():
+        driver = webdriver.Chrome()
+        driver.get("https://uk.finance.yahoo.com/")
+        button = driver.find_element(by=By.CLASS_NAME, value="btn.secondary.accept-all")
+        button.click()
+        all_cookies=driver.get_cookies();
+        cookies_dict = {}
+        for cookie in all_cookies:
+                cookies_dict[cookie['name']] = cookie['value']
+        return cookies_dict
+
+session_handler = SessionHandler()
+session_handler.new_session()
+
+class YahooFinanceRequestHandler(RequestHandler):
+
+    def __init__(self):
+        self.response = None
+
+    def request_data(self, request_object: APIRequest, session_handler: SessionHandler, retries=1, max_retries=10):
+            if retries >= max_retries:
+                print(f"REQUEST FAILED :: aborting request.")
+                return     
+            if session == None:
+                request_object.session = session_handler.new_session()   
+            response = request_object.request_data()
+            if response.status_code != 200:
+                print(f"REQUEST FAILED :: STATUS CODE: {response.status_code} :: RETRIES : {retries}")
+                retries += 1
+                session = session_handler.new_session()
+                self.request_data(request_object, session_handler, retries)
+            else:
+                self.response = response
+            return
+
+class YahooFinanceRequestStatistics(APIRequest):
+
+    def request_data(self):
+        pass
+
+class YahooFinanceRequestAnalysis(APIRequest):
+
+    def request_data(self):
+        pass
+
+class YahoooFinanceRequestIncomeStatement(APIRequest):
+
+    def request_data(self):
+        pass
+
+class YahooFinanceRequestCashFlow(APIRequest):
+
+    def request_data(self):
+        pass
+
+
 
 
 class CompanyStatistics:

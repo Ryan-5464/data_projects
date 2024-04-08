@@ -1,24 +1,23 @@
 import pandas
-import requests
+import json
 
 def load_tickers():
-    csv = pandas.read_csv("company_ticker_list.csv")
+    csv = pandas.read_csv("./company_ticker_list.csv")
     ticker_list = csv.iloc[:,0] 
     return list(ticker_list)
+"""
+def download_and_save_data(
+        ticker_list: list[str],
+        request_handler: interfaces.RequestHandler,
+        session_handler: interfaces.SessionHandler,
+        save_handlers: interfaces.SaveHandler,
+        request_objects: list[interfaces.APIRequest]
+    ):
+    for ticker in ticker_list:
+        for request_object in request_objects:
+            request_object.ticker = ticker
+            request_handler.request_data(request_object, session_handler)
+            for save_handler in save_handlers:
+                save_handler.save(json.loads(request_handler.response.text))
 
-def get_company_statistics(ticker):
-    statistics_html = requests.get(f"https://uk.finance.yahoo.com/quote/{ticker}/key-statistics")
-    company_statistics = CompanyStatistics()
-    return company_statistics
-
-def get_company_income_statement(ticker):
-    income_statement_html = requests.get("https://uk.finance.yahoo.com/quote/{ticker}/financials").text
-    return income_statement_html
-
-def get_company_balance_sheet(ticker):
-    balance_sheet_html = requests.get("https://uk.finance.yahoo.com/quote/{ticker}/balance-sheet").text
-    return balance_sheet_html
-
-def get_company_cash_flow(ticker):
-    cash_flow_html = requests.get("https://uk.finance.yahoo.com/quote/{ticker}/cash-flow").text
-    return cash_flow_html
+"""
