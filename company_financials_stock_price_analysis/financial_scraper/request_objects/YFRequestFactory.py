@@ -1,65 +1,22 @@
-from company_financials_stock_price_analysis.financial_scraper.request_objects.IRequestObject import IRequest
+from IRequestFactory import IRequestFactory
+from YFRequest import YFRequest
+import requests
 
 
-class YahooFinanceRequestObject(IRequestObject):
 
-      def __init__(
-                  self, 
-                  base_url: str,
-                  referer: str,
-                  fields: list[str],
-                  #crumb=None
-      ):
-            self._base_url = base_url
-            self._referer = referer
-            self._fields = fields
-            #self._crumb = crumb
+class YFRequestFactory(IRequestFactory):
 
-      def url(self, ticker: str) -> str:
-            BASE_URL = self._base_url.replace("[TICKER]", ticker)
-            #if self._crumb == None:
-            REQUEST_PARAMETERS = self.__format_request_parameters(ticker)
-            #if self._crumb != None:
-                  #REQUEST_PARAMETERS = self.__format_request_parameters_with_crumb(ticker)
-            REQUEST_URL = f"{BASE_URL}?{REQUEST_PARAMETERS}"
-            print(f"REQUEST_URL: {REQUEST_URL}")
-            return REQUEST_URL
+      HEADERS = {
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
+            "Origin": "https://uk.finance.yahoo.com",
+            "Referer": "[REFERER]",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+      }
 
-      def __format_request_parameters(self, ticker: str) -> str:
-            PARAMETERISED_FIELDS = ""
-            for FIELD in self._fields:
-                  PARAMETERISED_FIELDS += f"{FIELD}%2C"
-            PARAMETERISED_FIELDS = PARAMETERISED_FIELDS[:-3]
-            URL_PARAMETERS = f"lang=en-GB&region=GB&symbol={ticker}&padTimeSeries=true&type={PARAMETERISED_FIELDS}&merge=false&period1=0&period2=3000000000&corsDomain=uk.finance.yahoo.com"
-            return URL_PARAMETERS
-
-      #def __format_request_parameters(self, ticker: str) -> str:
-            #PARAMETERISED_FIELDS = ""
-            #for FIELD in self._fields:
-                  #PARAMETERISED_FIELDS += f"{FIELD}%2C"
-            #PARAMETERISED_FIELDS = PARAMETERISED_FIELDS[:-3]
-            #URL_PARAMETERS = f"lang=en-GB&region=GB&symbol={ticker}&padTimeSeries=true&modules={PARAMETERISED_FIELDS}&merge=false&period1=0&period2=3000000000&corsDomain=uk.finance.yahoo.com"
-            #return URL_PARAMETERS
-      
-      def headers(self, ticker: str) -> dict:
-            headers = {
-                  "Accept": "*/*",
-                  "Accept-Encoding": "gzip, deflate, br, zstd",
-                  "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
-                  "Origin": "https://uk.finance.yahoo.com",
-                  "Referer": self._referer.replace("[TICKER]", ticker),
-                  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
-            }
-            return headers
-
-      def _payload(self):
-            return
-
-      def _proxies(self):
-            return
-
-
-class YahooFinanceRequestObjectFactory():
+      URL_PARAMETERS_FINANCIALS = f"lang=en-GB&region=GB&symbol=[TICKER]&padTimeSeries=true&type=[PARAMETERISED_FIELDS]&merge=false&period1=0&period2=3000000000&corsDomain=uk.finance.yahoo.com"
+      URL_PARAMETERS_ANALYSIS = f"formatted=true&crumb=[CRUMB]&lang=en-GB&region=GB&modules=[PARAMETERISED_FIELDS]&symbol=[TICKER]&corsDomain=uk.finance.yahoo.com"
 
       ANNUAL_BALANCE_SHEET_BASE_URL = "https://query1.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries"
       ANNUAL_BALANCE_SHEET_REFERER = "https://uk.finance.yahoo.com/quote/[TICKER]/balance-sheet"
@@ -89,72 +46,153 @@ class YahooFinanceRequestObjectFactory():
       STATISTICS_REFERER = "https://uk.finance.yahoo.com/quote/[TICKER]/key-statistics"
       STATISTICS_FIELDS = ['quarterlyMarketCap', 'trailingMarketCap', 'quarterlyEnterpriseValue', 'trailingEnterpriseValue', 'quarterlyPeRatio', 'trailingPeRatio', 'quarterlyForwardPeRatio', 'trailingForwardPeRatio', 'quarterlyPegRatio', 'trailingPegRatio', 'quarterlyPsRatio', 'trailingPsRatio', 'quarterlyPbRatio', 'trailingPbRatio', 'quarterlyEnterprisesValueRevenueRatio', 'trailingEnterprisesValueRevenueRatio', 'quarterlyEnterprisesValueEBITDARatio', 'trailingEnterprisesValueEBITDARatio']
 
-      #ANALYSIS_BASE_URL = "https://query1.finance.yahoo.com/v10/finance/quoteSummary/[TICKER]"
-      #ANALYSIS_REFERER = "https://uk.finance.yahoo.com/quote/[TICKER]/analysis"
-      #ANALYSIS_FIELDS = ['upgradeDowngradeHistory', 'recommendationTrend', 'financialData', 'earningsHistory', 'earningsTrend', 'industryTrend', 'indexTrend', 'sectorTrend']
-      #ANALYSIS_CRUMB = "45WGS5sXKp6"
-      #analysis_formatted = "true"
+      ANALYSIS_BASE_URL = "https://query1.finance.yahoo.com/v10/finance/quoteSummary/[TICKER]"
+      ANALYSIS_REFERER = "https://uk.finance.yahoo.com/quote/[TICKER]/analysis"
+      ANALYSIS_FIELDS = ['upgradeDowngradeHistory', 'recommendationTrend', 'financialData', 'earningsHistory', 'earningsTrend', 'industryTrend', 'indexTrend', 'sectorTrend']
 
       @classmethod
-      def make_request_object(cls, ticker:str, request_object_type:str) -> YahooFinanceRequestObject:
+      def make_request_object(cls, request_object_type:str, session_handler:requests.Session) -> IRequest:
+
             match request_object_type:
                   case "annual_balance_sheet":
-                        request_object = YahooFinanceRequestObject(
-                              ticker, 
-                              cls.ANNUAL_BALANCE_SHEET_BASE_URL, 
-                              cls.ANNUAL_BALANCE_SHEET_REFERER, 
-                              cls.ANNUAL_BALANCE_SHEET_FIELDS
+
+                        request_object = YFRequest(
+                              url=cls.__url(
+                                    base_url=cls.ANNUAL_BALANCE_SHEET_BASE_URL, 
+                                    fields=cls.ANNUAL_BALANCE_SHEET_FIELDS, 
+                                    parameters=cls.URL_PARAMETERS_FINANCIALS
+                              ), 
+                              headers=cls.__headers(
+                                    headers=cls.HEADERS, 
+                                    referer=cls.ANNUAL_BALANCE_SHEET_REFERER
+                              ), 
                         )
+
                   case "quarterly_balance_sheet":
-                        request_object = YahooFinanceRequestObject(
-                              ticker, 
-                              cls.QUARTERLY_BALANCE_SHEET_BASE_URL, 
-                              cls.QUARTERLY_BALANCE_SHEET_REFERER, 
-                              cls.QUARTERLY_BALANCE_SHEET_FIELDS
+
+                        request_object = YFRequest(
+                              url=cls.__url(
+                                    base_url=cls.QUARTERLY_BALANCE_SHEET_BASE_URL, 
+                                    fields=cls.QUARTERLY_BALANCE_SHEET_FIELDS, 
+                                    parameters=cls.URL_PARAMETERS_FINANCIALS
+                              ), 
+                              headers=cls.__headers(
+                                    headers=cls.HEADERS, 
+                                    referer=cls.QUARTERLY_BALANCE_SHEET_REFERER
+                              ), 
                         )
+
                   case "annual_cash_flow":
-                        request_object = YahooFinanceRequestObject(
-                              ticker, 
-                              cls.ANNUAL_CASH_FLOW_BASE_URL, 
-                              cls.ANNUAL_CASH_FLOW_REFERER, 
-                              cls.ANNUAL_CASH_FLOW_FIELDS
+
+                        request_object = YFRequest(
+                              url=cls.__url(
+                                    base_url=cls.ANNUAL_CASH_FLOW_BASE_URL, 
+                                    fields=cls.ANNUAL_CASH_FLOW_FIELDS, 
+                                    parameters=cls.URL_PARAMETERS_FINANCIALS
+                              ), 
+                              headers=cls.__headers(
+                                    headers=cls.HEADERS, 
+                                    referer=cls.ANNUAL_CASH_FLOW_REFERER
+                              ), 
                         )
+
                   case "quarterly_cash_flow":
-                        request_object = YahooFinanceRequestObject(
-                              ticker, 
-                              cls.QUARTERLY_CASH_FLOW_BASE_URL, 
-                              cls.QUARTERLY_CASH_FLOW_REFERER, 
-                              cls.QUARTERLY_CASH_FLOW_FIELDS
+
+                        request_object = YFRequest(
+                              url=cls.__url(
+                                    base_url=cls.QUARTERLY_CASH_FLOW_BASE_URL, 
+                                    fields=cls.QUARTERLY_CASH_FLOW_FIELDS, 
+                                    parameters=cls.URL_PARAMETERS_FINANCIALS
+                              ), 
+                              headers=cls.__headers(
+                                    headers=cls.HEADERS, 
+                                    referer=cls.QUARTERLY_CASH_FLOW_REFERER
+                              ), 
                         )
+
                   case "annual_income_statement":
-                        request_object = YahooFinanceRequestObject(
-                              ticker, 
-                              cls.ANNUAL_INCOME_STATEMENT_BASE_URL, 
-                              cls.ANNUAL_INCOME_STATEMENT_REFERER, 
-                              cls.ANNUAL_INCOME_STATEMENT_FIELDS
+
+                        request_object = YFRequest(
+                              url=cls.__url(
+                                    base_url=cls.ANNUAL_INCOME_STATEMENT_BASE_URL, 
+                                    fields=cls.ANNUAL_INCOME_STATEMENT_FIELDS, 
+                                    parameters=cls.URL_PARAMETERS_FINANCIALS
+                              ), 
+                              headers=cls.__headers(
+                                    headers=cls.HEADERS, 
+                                    referer=cls.ANNUAL_INCOME_STATEMENT_REFERER
+                              ), 
                         )
+
                   case "quarterly_income_statement":
-                        request_object = YahooFinanceRequestObject(
-                              ticker, 
-                              cls.QUARTERLY_INCOME_STATEMENT_BASE_URL, 
-                              cls.QUARTERLY_INCOME_STATEMENT_REFERER, 
-                              cls.QUARTERLY_INCOME_STATEMENT_FIELDS
+
+                        request_object = YFRequest(
+                              url=cls.__url(
+                                    base_url=cls.QUARTERLY_INCOME_STATEMENT_BASE_URL, 
+                                    fields=cls.QUARTERLY_INCOME_STATEMENT_FIELDS, 
+                                    parameters=cls.URL_PARAMETERS_FINANCIALS
+                              ), 
+                              headers=cls.__headers(
+                                    headers=cls.HEADERS, 
+                                    referer=cls.QUARTERLY_INCOME_STATEMENT_REFERER
+                              ), 
                         )
-                  case "ANALYSIS":
-                        request_object = YahooFinanceRequestObject(
-                              ticker, 
-                              cls.STATISTICS_BASE_URL, 
-                              cls.STATISTICS_REFERER, 
-                              cls.STATISTICS_FIELDS
+
+                  case "statistics":
+
+                        request_object = YFRequest(
+                              url=cls.__url(
+                                    base_url=cls.STATISTICS_BASE_URL, 
+                                    fields=cls.STATISTICS_FIELDS, 
+                                    parameters=cls.URL_PARAMETERS_FINANCIALS
+                              ), 
+                              headers=cls.__headers(
+                                    headers=cls.HEADERS, 
+                                    referer=cls.STATISTICS_REFERER
+                              ), 
                         )
-                  #case "analysis":
-                        #request_object = YahooFinanceRequestObject(
-                              #ticker, 
-                              #cls.ANALYSIS_BASE_URL, 
-                              #cls.ANALYSIS_REFERER, 
-                              #cls.ANALYSIS_FIELDS,
-                              #cls.ANALYSIS_CRUMB,
-                        #)
+
+                  case "analysis":
+
+                        request_object = YFRequest(
+                              url=cls.__url(
+                                    base_url=cls.ANALYSIS_BASE_URL, 
+                                    fields=cls.ANALYSIS_FIELDS, 
+                                    parameters=cls.URL_PARAMETERS_ANALYSIS
+                              ), 
+                              headers=cls.__headers(
+                                    headers=cls.HEADERS, 
+                                    referer=cls.ANALYSIS_REFERER
+                              ), 
+                              crumb=cls.__get_crumb(session_handler)
+                        )
+
             return request_object
+
+      @classmethod
+      def __headers(cls, headers, referer) -> dict:
+            headers["Referer"] = referer
+            return headers
+
+      @classmethod
+      def __url(cls, base_url, fields, parameters) -> str:
+            parameterised_fields = ""
+            for FIELD in fields:
+                  parameterised_fields += f"{FIELD}%2C"
+            parameterised_fields = parameterised_fields[:-3]
+            request_parameters = parameters.replace("[PARAMETERISED_FIELDS]", parameterised_fields)
+            request_url = f"{base_url}?{request_parameters}"
+            print(f"REQUEST_URL: {request_url}")
+            return request_url
+
+      @classmethod
+      def __get_crumb(cls, session_handler: ISessionHandler) -> str:
+            url = "https://query1.finance.yahoo.com/v1/test/getcrumb"
+            session = session_handler.new_session()
+            session.headers = cls.HEADERS
+            del session.headers["Referer"]
+            response = session.get(url)
+            crumb = response.text
+            return crumb
 
 

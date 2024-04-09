@@ -1,13 +1,39 @@
 import functions
 import json
 
-from handlers.YahooFinanceSessionHandler import YahooFinanceSessionHandler
-from handlers.YahooFinanceRequestHandler import YahooFinanceRequestHandler
+from handlers.YFSessionHandler import YFSessionHandler
+from handlers.YFRequestHandler import YFRequestHandler
 from company_financials_stock_price_analysis.financial_scraper.request_objects.RequestAnnualBalanceSheet import RequestAnnualBalanceSheet
 
 def main():
       #ticker_list = functions.load_tickers()
       ticker = "TSLA"
+
+      session_handler = YFSessionHandler()
+      request_object = YFRequestFactory.make_request_object(request_object_type="analysis", session_handler=session_handler)
+
+      request_handler = YFRequestHandler()
+      session = session_handler.new_session()
+      response, session = request_handler.request_data(ticker=ticker, request_object=request_object, session_handler=session_handler, session=session)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       response = YahooFinanceRequestHandler.request_data(
             request_object=RequestAnnualBalanceSheet(ticker),
             session_handler=YahooFinanceSessionHandler
