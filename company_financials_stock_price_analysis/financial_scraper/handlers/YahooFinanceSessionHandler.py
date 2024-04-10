@@ -1,12 +1,9 @@
- import requests
+import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from coding.github.personal.data_projects.company_financials_stock_price_analysis.financial_scraper.handlers.ISession import ISessionHandler
 
-class YFSessionHandler(ISessionHandler):
-
-    def __init__(self):
-        pass
+class YahooFinanceSessionHandler(ISessionHandler):
     
     @classmethod
     def new_session(cls):

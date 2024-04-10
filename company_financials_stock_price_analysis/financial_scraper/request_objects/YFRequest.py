@@ -1,5 +1,5 @@
 from IRequest import IRequest
-from company_financials_stock_price_analysis.financial_scraper.handlers.ISessionHandler import ISessionHandler
+from coding.github.personal.data_projects.company_financials_stock_price_analysis.financial_scraper.handlers.ISession import ISessionHandler
 from typing import Optional
 
 

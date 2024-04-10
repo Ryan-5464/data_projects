@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import requests
 
-class ISessionHandler(ABC):
+class ISession(ABC):
 
       session: requests.Session
 

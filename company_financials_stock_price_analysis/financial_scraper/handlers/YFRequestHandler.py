@@ -1,6 +1,6 @@
 from company_financials_stock_price_analysis.financial_scraper.request_objects.IRequest import IRequest
 from handlers.IRequestHandler import IRequestHandler
-from handlers.ISessionHandler import ISessionHandler
+from coding.github.personal.data_projects.company_financials_stock_price_analysis.financial_scraper.handlers.ISession import ISessionHandler
 import requests
 from typing import Optional
 
