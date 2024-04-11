@@ -10,6 +10,7 @@ class YFSession(ISession):
 
       def __init__(self):
             self.session = self.new_session()
+            time.sleep(1)
             self.crumb = self.new_crumb()
 
       def new_session(self) -> requests.Session:
@@ -22,8 +23,11 @@ class YFSession(ISession):
                   print("Could not retrieve crumb!")
                   return ""
             url = "https://query1.finance.yahoo.com/v1/test/getcrumb"
-            response = requests.get(url)
+            self.session.headers = self.__headers()
+            response = self.session.get(url)
             if response.status_code != 200:
+                  print(response.text)
+                  print(response.status_code)
                   print("Failed to retrieve crumb, retrying...")
                   time.sleep(1)
                   retries += 1
@@ -53,3 +57,14 @@ class YFSession(ISession):
                   return self.new_crumb(retries=retries)
             print("Succesfully retrieved cookies: ", cookies_dict)
             return cookies_dict
+
+      def __headers(self):
+            headers = {
+                  "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                  "Accept-Encoding": "gzip, deflate, br, zstd",
+                  "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
+                  "Cache-Control": "no-cache",
+                  "Pragma": "no-cache",
+                  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+            }
+            return headers
