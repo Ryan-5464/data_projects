@@ -1,5 +1,7 @@
-from IRequestFactory import IRequestFactory
-from YFRequest import YFRequest
+from coding.github.personal.data_projects.company_financials_stock_price_analysis.interfaces.IRequestFactory import IRequestFactory
+from coding.github.personal.data_projects.company_financials_stock_price_analysis.interfaces.IRequestHandler import IRequestHandler
+from coding.github.personal.data_projects.company_financials_stock_price_analysis.interfaces.ISessionHandler import ISessionHandler
+from coding.github.personal.data_projects.company_financials_stock_price_analysis.financial_scraper.handlers.YFRequestHandler import YFRequestHandler
 import requests
 
 
@@ -51,12 +53,13 @@ class YFRequestFactory(IRequestFactory):
       ANALYSIS_FIELDS = ['upgradeDowngradeHistory', 'recommendationTrend', 'financialData', 'earningsHistory', 'earningsTrend', 'industryTrend', 'indexTrend', 'sectorTrend']
 
       @classmethod
-      def make_request_object(cls, request_object_type:str, session_handler:requests.Session) -> IRequest:
+      def make_request_object(cls, session_handler:ISessionHandler, request_object_type:str) -> IRequestHandler:
 
             match request_object_type:
                   case "annual_balance_sheet":
 
-                        request_object = YFRequest(
+                        request_object = YFRequestHandler(
+                              session_handler = session_handler,
                               url=cls.__url(
                                     base_url=cls.ANNUAL_BALANCE_SHEET_BASE_URL, 
                                     fields=cls.ANNUAL_BALANCE_SHEET_FIELDS, 
@@ -70,7 +73,8 @@ class YFRequestFactory(IRequestFactory):
 
                   case "quarterly_balance_sheet":
 
-                        request_object = YFRequest(
+                        request_object = YFRequestHandler(
+                              session_handler = session_handler,
                               url=cls.__url(
                                     base_url=cls.QUARTERLY_BALANCE_SHEET_BASE_URL, 
                                     fields=cls.QUARTERLY_BALANCE_SHEET_FIELDS, 
@@ -84,7 +88,8 @@ class YFRequestFactory(IRequestFactory):
 
                   case "annual_cash_flow":
 
-                        request_object = YFRequest(
+                        request_object = YFRequestHandler(
+                              session_handler = session_handler,
                               url=cls.__url(
                                     base_url=cls.ANNUAL_CASH_FLOW_BASE_URL, 
                                     fields=cls.ANNUAL_CASH_FLOW_FIELDS, 
@@ -98,7 +103,8 @@ class YFRequestFactory(IRequestFactory):
 
                   case "quarterly_cash_flow":
 
-                        request_object = YFRequest(
+                        request_object = YFRequestHandler(
+                              session_handler = session_handler,
                               url=cls.__url(
                                     base_url=cls.QUARTERLY_CASH_FLOW_BASE_URL, 
                                     fields=cls.QUARTERLY_CASH_FLOW_FIELDS, 
@@ -112,7 +118,8 @@ class YFRequestFactory(IRequestFactory):
 
                   case "annual_income_statement":
 
-                        request_object = YFRequest(
+                        request_object = YFRequestHandler(
+                              session_handler = session_handler,
                               url=cls.__url(
                                     base_url=cls.ANNUAL_INCOME_STATEMENT_BASE_URL, 
                                     fields=cls.ANNUAL_INCOME_STATEMENT_FIELDS, 
@@ -126,7 +133,8 @@ class YFRequestFactory(IRequestFactory):
 
                   case "quarterly_income_statement":
 
-                        request_object = YFRequest(
+                        request_object = YFRequestHandler(
+                              session_handler = session_handler,
                               url=cls.__url(
                                     base_url=cls.QUARTERLY_INCOME_STATEMENT_BASE_URL, 
                                     fields=cls.QUARTERLY_INCOME_STATEMENT_FIELDS, 
@@ -140,7 +148,8 @@ class YFRequestFactory(IRequestFactory):
 
                   case "statistics":
 
-                        request_object = YFRequest(
+                        request_object = YFRequestHandler(
+                              session_handler = session_handler,
                               url=cls.__url(
                                     base_url=cls.STATISTICS_BASE_URL, 
                                     fields=cls.STATISTICS_FIELDS, 
@@ -154,7 +163,8 @@ class YFRequestFactory(IRequestFactory):
 
                   case "analysis":
 
-                        request_object = YFRequest(
+                        request_object = YFRequestHandler(
+                              session_handler = session_handler,
                               url=cls.__url(
                                     base_url=cls.ANALYSIS_BASE_URL, 
                                     fields=cls.ANALYSIS_FIELDS, 
@@ -164,7 +174,6 @@ class YFRequestFactory(IRequestFactory):
                                     headers=cls.HEADERS, 
                                     referer=cls.ANALYSIS_REFERER
                               ), 
-                              crumb=cls.__get_crumb(session_handler)
                         )
 
             return request_object
@@ -185,14 +194,5 @@ class YFRequestFactory(IRequestFactory):
             print(f"REQUEST_URL: {request_url}")
             return request_url
 
-      @classmethod
-      def __get_crumb(cls, session_handler: ISessionHandler) -> str:
-            url = "https://query1.finance.yahoo.com/v1/test/getcrumb"
-            session = session_handler.new_session()
-            session.headers = cls.HEADERS
-            del session.headers["Referer"]
-            response = session.get(url)
-            crumb = response.text
-            return crumb
 
 
