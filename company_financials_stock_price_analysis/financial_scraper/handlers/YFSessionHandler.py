@@ -1,4 +1,4 @@
-#from coding.github.personal.data_projects.company_financials_stock_price_analysis.interfaces.ISessionHandler import ISessionHandler
+#from coding.github.personal.data_projects.company_financials_stock_price_analysis.financial_scraper.interfaces.ISessionHandler import ISessionHandler
 from interfaces.ISessionHandler import ISessionHandler
 import requests
 from selenium import webdriver

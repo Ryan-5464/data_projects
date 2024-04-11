@@ -1,5 +1,5 @@
-from coding.github.personal.data_projects.company_financials_stock_price_analysis.interfaces.IRequestHandler import IRequestHandler
-from coding.github.personal.data_projects.company_financials_stock_price_analysis.interfaces.ISessionHandler import ISessionHandler
+from coding.github.personal.data_projects.company_financials_stock_price_analysis.financial_scraper.interfaces.IRequestHandler import IRequestHandler
+from coding.github.personal.data_projects.company_financials_stock_price_analysis.financial_scraper.interfaces.ISessionHandler import ISessionHandler
 from typing import Optional
 import requests
 import time

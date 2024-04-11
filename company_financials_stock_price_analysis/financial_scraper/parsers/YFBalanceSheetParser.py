@@ -1,7 +1,7 @@
 from IParser import IParser
 
 
-class YahooFinanceBalanceSheetParser(IParser):
+class YFBalanceSheetParser(IParser):
 
       @staticmethod
       def parse_data():
