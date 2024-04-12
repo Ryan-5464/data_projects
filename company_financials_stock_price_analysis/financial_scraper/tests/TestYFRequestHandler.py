@@ -1,11 +1,18 @@
 import unittest
 from interfaces.ISessionHandler import ISessionHandler
 from factories.YFRequestFactory import YFRequestFactory
+import requests
 
 class TestYFRequestHandler(unittest.TestCase):
 
       def test_request_handler_correctly_formats_request_url(self):
-            expected_url = "https://query1.finance.yahoo.com/v10/finance/quoteSummary/[TestTicker]?formatted=true&crumb=[TestCrumb]&lang=en-GB&region=GB&modules=upgradeDowngradeHistory2%CrecommendationTrend2%CfinancialData2%CearningsHistory2%CearningsTrend2%CindustryTrend2%CindexTrend2%CsectorTrend&symbol=[TTestTicker]&corsDomain=uk.finance.yahoo.com"
+            expected_url = "https://query1.finance.yahoo.com/v10/finance/quoteSummary/[TestTicker]?formatted=true&crumb=[TestCrumb]&lang=en-GB&region=GB&modules=upgradeDowngradeHistory%2CrecommendationTrend%2CfinancialData%2CearningsHistory%2CearningsTrend%2CindustryTrend%2CindexTrend%2CsectorTrend&symbol=[TestTicker]&corsDomain=uk.finance.yahoo.com"
+            session_handler = TestSessionHandler()
+            request_handler = YFRequestFactory.make_request_object(session_handler, "analysis")
+            result_url = request_handler.url(ticker="[TestTicker]")
+            self.assertEqual(result_url, expected_url)
+
+      def test_request_handler_correctly_formats_request_headers(self):
             expected_headers = {
                   "Accept": "*/*",
                   "Accept-Encoding": "gzip, deflate, br, zstd",
@@ -16,21 +23,15 @@ class TestYFRequestHandler(unittest.TestCase):
             }
             session_handler = TestSessionHandler()
             request_handler = YFRequestFactory.make_request_object(session_handler, "analysis")
-            result_url = request_handler.url(ticker="[TestTicker]")
             result_headers = request_handler.headers(ticker="[TestTicker]")
             self.assertEqual(result_headers, expected_headers)
-            self.assertEqual(result_url, expected_url)
-
-      def test_request_handler_correctly_formats_request_headers():
-            NotImplemented
-
 
 
 class TestSessionHandler(ISessionHandler):
 
       def __init__(self):
-            self.session = None
-            self.crumb = None
+            self.new_session()
+            self.new_crumb()
 
       def new_session(self):
             self.session = None
