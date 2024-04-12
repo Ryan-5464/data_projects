@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 import requests
-from ISessionHandler import ISessionHandler
+from interfaces.ISessionHandler import ISessionHandler
 
 
 class IRequestHandler(ABC):

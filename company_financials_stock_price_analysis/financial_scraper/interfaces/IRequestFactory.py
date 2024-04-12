@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from IRequestHandler import IRequestHandler
+from interfaces.IRequestHandler import IRequestHandler
 
 
 class IRequestFactory(ABC):

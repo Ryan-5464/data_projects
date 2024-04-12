@@ -5,7 +5,7 @@ from typing import Optional
 class ISessionHandler(ABC):
 
       session: requests.Session
-      crumb: Optional[str]
+      crumb: str
 
       @abstractmethod
       def new_session(self):

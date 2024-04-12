@@ -10,18 +10,18 @@ import time
 class YFSessionHandler(ISessionHandler):
 
       def __init__(self):
-            self.session = self.new_session()
+            self.new_session()
             time.sleep(1)
-            self.crumb = self.new_crumb()
+            self.new_crumb()
 
       def new_session(self):
             self.session = requests.Session()
             requests.utils.add_dict_to_cookiejar(self.session.cookies, self.__get_site_cookies())
 
       def new_crumb(self, retries=0, max_retries=3):
+            self.crumb = ""
             if retries >= max_retries:
                   print("Could not retrieve crumb!")
-                  return ""
             url = "https://query1.finance.yahoo.com/v1/test/getcrumb"
             self.session.headers = self.__headers()
             response = self.session.get(url)
@@ -31,7 +31,7 @@ class YFSessionHandler(ISessionHandler):
                   print("Failed to retrieve crumb, retrying...")
                   time.sleep(1)
                   retries += 1
-                  return self.new_crumb(retries=retries)
+                  self.new_crumb(retries=retries)
             self.crumb = response.text
             print("Successfully retrieved crumb: ", self.crumb)
 

@@ -1,5 +1,5 @@
-from coding.github.personal.data_projects.company_financials_stock_price_analysis.financial_scraper.interfaces.IRequestHandler import IRequestHandler
-from coding.github.personal.data_projects.company_financials_stock_price_analysis.financial_scraper.interfaces.ISessionHandler import ISessionHandler
+from interfaces.IRequestHandler import IRequestHandler
+from interfaces.ISessionHandler import ISessionHandler
 from typing import Optional
 import requests
 import time
@@ -38,6 +38,8 @@ class YFRequestHandler(IRequestHandler):
                   print(f"REQUEST FAILED :: aborting request.")
                   return
             self._session_handler.session.headers = self.headers(ticker=ticker)
+            print("/n Headers =:", self._session_handler.session.headers)
+            print("/n Url =:", self.url(ticker=ticker))
             response = self._session_handler.session.get(self.url(ticker=ticker))
             if response.status_code != 200:
                   print(f"REQUEST FAILED :: STATUS CODE: {response.status_code} :: RETRIES : {retries}")
