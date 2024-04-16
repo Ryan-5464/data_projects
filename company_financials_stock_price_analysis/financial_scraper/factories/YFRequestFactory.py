@@ -68,6 +68,7 @@ class YFRequestFactory(IRequestFactory):
                                     headers=cls.HEADERS.copy(), 
                                     referer=cls.ANNUAL_BALANCE_SHEET_REFERER
                               ), 
+                              product_type="annual_balance_sheet"
                         )
 
                   case "quarterly_balance_sheet":
@@ -83,6 +84,7 @@ class YFRequestFactory(IRequestFactory):
                                     headers=cls.HEADERS, 
                                     referer=cls.QUARTERLY_BALANCE_SHEET_REFERER
                               ), 
+                              product_type="quarterly_balance_sheet"
                         )
 
                   case "annual_cash_flow":
@@ -98,6 +100,7 @@ class YFRequestFactory(IRequestFactory):
                                     headers=cls.HEADERS, 
                                     referer=cls.ANNUAL_CASH_FLOW_REFERER
                               ), 
+                              product_type="annual_cash_flow"
                         )
 
                   case "quarterly_cash_flow":
@@ -113,6 +116,7 @@ class YFRequestFactory(IRequestFactory):
                                     headers=cls.HEADERS, 
                                     referer=cls.QUARTERLY_CASH_FLOW_REFERER
                               ), 
+                              product_type="quarterly_cash_flow"
                         )
 
                   case "annual_income_statement":
@@ -128,6 +132,7 @@ class YFRequestFactory(IRequestFactory):
                                     headers=cls.HEADERS, 
                                     referer=cls.ANNUAL_INCOME_STATEMENT_REFERER
                               ), 
+                              product_type="annual_income_statement"
                         )
 
                   case "quarterly_income_statement":
@@ -143,6 +148,7 @@ class YFRequestFactory(IRequestFactory):
                                     headers=cls.HEADERS, 
                                     referer=cls.QUARTERLY_INCOME_STATEMENT_REFERER
                               ), 
+                              product_type="quarterly_income_statement"
                         )
 
                   case "statistics":
@@ -158,6 +164,7 @@ class YFRequestFactory(IRequestFactory):
                                     headers=cls.HEADERS, 
                                     referer=cls.STATISTICS_REFERER
                               ), 
+                              product_type="statistics"
                         )
 
                   case "analysis":
@@ -173,6 +180,7 @@ class YFRequestFactory(IRequestFactory):
                                     headers=cls.HEADERS, 
                                     referer=cls.ANALYSIS_REFERER
                               ), 
+                              product_type="analysis"
                         )
 
             return request_object

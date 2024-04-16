@@ -22,6 +22,7 @@ class YFSessionHandler(ISessionHandler):
             self.crumb = ""
             if retries >= max_retries:
                   print("Could not retrieve crumb!")
+                  return
             url = "https://query1.finance.yahoo.com/v1/test/getcrumb"
             self.session.headers = self.__headers()
             response = self.session.get(url)

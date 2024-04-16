@@ -6,10 +6,11 @@ import time
 
 class YFRequestHandler(IRequestHandler):
 
-      def __init__(self, session_handler:ISessionHandler, url:str, headers:str):
+      def __init__(self, session_handler:ISessionHandler, url:str, headers:str, product_type:str):
             self._session_handler = session_handler
             self._url = url
             self._headers = headers
+            self._product_type = product_type
 
       def url(self, ticker:str) -> str:
             url = self._url
@@ -51,3 +52,6 @@ class YFRequestHandler(IRequestHandler):
                   return self.request_data(ticker, retries)
             else:
                   return response
+            
+      def get_product_type(self) -> str:
+            return self._product_type
