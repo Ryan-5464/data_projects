@@ -8,7 +8,7 @@ class YFState(IState):
       def __init__(self, root_dir):
             self.root_dir = root_dir
             self.ticker_list = YFState.__load_tickers(self.root_dir)
-            self.list_length = len(self.ticker_list)
+            self.ticker_count = len(self.ticker_list)
 
       @staticmethod
       def __load_tickers(root_dir):
@@ -24,7 +24,7 @@ class YFState(IState):
       def save_state(self):
             state = {
                   "ticker_list": self.ticker_list,
-                  "list_length": self.list_length
+                  "ticker_count": self.ticker_count
             }
             with open(f"{self.root_dir}/state/current_state.json", 'w') as f:
                   f.write(json.dumps(state, indent=4))
@@ -34,10 +34,10 @@ class YFState(IState):
                   with open(f"{self.root_dir}/state/current_state.json", 'r') as f:
                         state = json.loads(f.read())
                   self.ticker_list = state.get("ticker_list")
-                  self.list_length = state.get("list_length")
+                  self.ticker_count = state.get("ticker_count")
             except FileNotFoundError:
                   pass
 
-      def current_progress(self, ticker_count):
-            progress = ((ticker_count-len(self.ticker_list)) / ticker_count) * 100
-            print(f"[{ticker_count-len(self.ticker_list)}/{ticker_count}] Progress {progress}\%")
+      def current_progress(self):
+            progress = round(((self.ticker_count-len(self.ticker_list)) / self.ticker_count) * 100, 2)
+            print(f"\n [{self.ticker_count-len(self.ticker_list)}/{self.ticker_count}] Progress {progress}% \n")

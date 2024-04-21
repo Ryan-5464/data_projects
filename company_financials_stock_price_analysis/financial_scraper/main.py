@@ -5,6 +5,7 @@ from state.YFState import YFState
 import time
 import os
 import json 
+import re
 
 def main():
 
@@ -30,23 +31,32 @@ def main():
       for request_type in request_types:
             request_handlers.append(YFRequestFactory.make_request_object(session_handler, request_type))
       
-      sleep_seconds = 5
+      sleep_seconds = 3
       while len(state.ticker_list) > 0:
 
             ticker = state.next_input()
+            try:
+                  ticker = ticker.replace("/", "|")
+            except AttributeError:
+                  continue
             state.current_progress()
 
             try:
-                  os.mkdir(f"{ROOT_DIR}/data_lake/{ticker}")
+                  os.mkdir(f"{ROOT_DIR}/data_lake/{re.escape(ticker)}")
             except FileExistsError:
                   pass
 
             for request_handler in request_handlers:
 
-                  time.sleep(sleep_seconds)
-                  response = request_handler.request_data(ticker=ticker)
+                  print("\n", f"[{ticker}]", request_handler.get_product_type())
 
-                  with open(f"{ROOT_DIR}/data_lake/{ticker}/{request_handler.get_product_type()}.json", 'w') as f:
+                  time.sleep(sleep_seconds)
+                  response = request_handler.request_data(ticker=ticker, root_dir=ROOT_DIR)
+
+                  if response is None:
+                        continue
+
+                  with open(f"{ROOT_DIR}/data_lake/{re.escape(ticker)}/{re.escape(ticker)}-{request_handler.get_product_type()}.json", 'w') as f:
                         f.write(json.dumps(response.text, indent=4))
 
             state.save_state()

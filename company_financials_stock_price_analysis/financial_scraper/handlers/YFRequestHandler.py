@@ -34,9 +34,11 @@ class YFRequestHandler(IRequestHandler):
             self._session_handler.crumb = self._session_handler.new_crumb()
             return
 
-      def request_data(self, ticker:str, retries=0, max_retries=3) -> Optional[requests.models.Response]:
+      def request_data(self, ticker:str, root_dir:str, retries=0, max_retries=1) -> Optional[requests.models.Response]:
             if retries >= max_retries:
                   print(f"REQUEST FAILED :: aborting request.")
+                  with open(f"{root_dir}/state/missing_ticker.txt",'a') as f:
+                        f.write(f"[{ticker}]")
                   return
             self._session_handler.session.headers = self.headers(ticker=ticker)
             print("/n Headers =:", self._session_handler.session.headers)
@@ -46,10 +48,10 @@ class YFRequestHandler(IRequestHandler):
                   print(f"REQUEST FAILED :: STATUS CODE: {response.status_code} :: RETRIES : {retries}")
                   retries += 1
                   self._session_handler.new_session()
-                  time.sleep(1)
+                  time.sleep(3)
                   self._session_handler.new_crumb()
-                  time.sleep(1)
-                  return self.request_data(ticker, retries)
+                  time.sleep(3)
+                  return self.request_data(ticker, root_dir, retries)
             else:
                   return response
             
